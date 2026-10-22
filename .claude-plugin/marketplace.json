@@ -1,0 +1,14 @@
+{
+  "name": "hans-mods",
+  "description": "Mods de Claude Code hechos por Hans Villalobos",
+  "owner": {
+    "name": "Hans Villalobos"
+  },
+  "plugins": [
+    {
+      "name": "sesiones-activas",
+      "source": "./sesiones-activas",
+      "description": "Columna y franja con las sesiones en las que estás trabajando, ordenadas por lo que necesitan de ti"
+    }
+  ]
+}
