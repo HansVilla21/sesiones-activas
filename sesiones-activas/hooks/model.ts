@@ -1,6 +1,7 @@
 import type { McpToolResult } from 'claude-code'
 
 import type { Actions, Bucket, Marks, Phase, Row, SessionRecord, View } from '../types'
+import { enFondo, lineaDeFondo } from './fondo'
 
 export const textOf = (result: McpToolResult): string => {
   const block = result.content.find(one => one.type === 'text') as { text?: string } | undefined
@@ -43,6 +44,7 @@ export const isListed = (record: SessionRecord, marks: Marks, now?: number): boo
 const STUCK_WORKING_MS = 2 * 60_000
 
 export const bucketOf = (record: SessionRecord, marks: Marks, isRunning: boolean, now: number): Bucket => {
+  if (enFondo(record, now)) return 'trabajando'
   if (record.phase === 'trabajando') {
     return !isRunning && now - record.phaseAt > STUCK_WORKING_MS ? 'quieta' : 'trabajando'
   }
@@ -106,6 +108,7 @@ export const buildView = (
 
     const isRunning = isSelf || live === null || live.running.has(record.id)
     const bucket = bucketOf(record, marks, isRunning, now)
+    const fondo = enFondo(record, now) ? (record.tareas ?? null) : null
     const row: Row = {
       id: record.id,
       title: displayTitle(record.title, record.cwd),
@@ -114,7 +117,8 @@ export const buildView = (
       isAsking: bucket === 'espera' && record.phase === 'pide',
       isSelf,
       ago: ago(Math.max(0, now - record.phaseAt)),
-      summary: bucket === 'espera' ? (record.summary ?? null) : null,
+      summary: bucket === 'espera' ? (record.summary ?? null) : fondo === null ? null : lineaDeFondo(fondo),
+      isBackground: fondo !== null,
     }
     view[bucket].push(row)
   }

@@ -31,7 +31,8 @@ const dotColor = (section: Section, row: Row): string =>
 const groupName = (group: string | null): string => group ?? 'sin grupo'
 
 // One row of a group's card: dot, name, then the time and the remove mark kept to the right edge; a waiting
-// session adds one dim line under its name saying what waits for you. The name is cut to the column's width and
+// session adds one dim line under its name saying what waits for you, and one that answered but still runs background
+// work has a half dot and a line saying so. The name is cut to the column's width and
 // only it may shrink, so a narrow column never pushes the time or the remove mark out of the card. The card's pill
 // already says where you are; in a card shared with other sessions your row says it too.
 const rowTree = (kit: Kit, section: Section, row: Row, columns: number | undefined, act: Actions, isShared: boolean) => {
@@ -41,7 +42,7 @@ const rowTree = (kit: Kit, section: Section, row: Row, columns: number | undefin
   return (
     <Box key={`fila-${row.id}`} flexDirection="column">
       <Box flexDirection="row" alignItems="center" gap={1}>
-        <Text color={dotColor(section, row)}>●</Text>
+        <Text color={dotColor(section, row)}>{row.isBackground === true ? '◐' : '●'}</Text>
         <Box flexGrow={1} flexShrink={1} overflow="hidden">
           <Button key={`ir-${row.id}`} label={short(row.title, titleRoom(columns, when))} plain onPress={() => act.jump(row)} />
         </Box>

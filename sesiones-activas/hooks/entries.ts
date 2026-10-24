@@ -1,6 +1,7 @@
 import type { Marks, SessionRecord } from '../types'
+import { isStartupRace, LOG_LINES } from './config'
 import type { EntrySuffix } from './model'
-import { entryOf } from './model'
+import { entryOf, errorText } from './model'
 
 /** One line of a folder listing. The 2.1.280 engine leaves `mtimeMs` out. */
 export type Entry = { name: string; kind: string; mtimeMs?: number }
@@ -95,6 +96,22 @@ export const appendLog = async (port: ReadPort & WritePort, dir: string | null, 
   const path = `${dir}/_errores.log`
   const before = ((await port.leer(path)) ?? '').split('\n').filter(one => one.length > 0).slice(-(keep - 1))
   await port.escribir(path, `${[...before, line].join('\n')}\n`)
+}
+
+/** Adds what failed and where to the error log, with its time. A call made before the app's tools connect is retried,
+ *  not an error; nothing when the folder is not known. Best effort: a failure to write the log never stops the mod. */
+export const logFailure = async (
+  port: ReadPort & WritePort & { ahora: () => Promise<number> },
+  dir: string | null,
+  where: string,
+  error: unknown,
+): Promise<void> => {
+  if (dir === null || isStartupRace(errorText(error))) return
+  try {
+    await appendLog(port, dir, `${new Date(await port.ahora()).toISOString()} ${where}: ${errorText(error)}`, LOG_LINES)
+  } catch {
+    // The log is best effort: a failure to write it must not stop the mod.
+  }
 }
 
 /** Leaves `{ at }` as the `suffix` mark of every id; nothing when the folder is not known. */

@@ -50,9 +50,12 @@ const armar = (on: On, env: Record<string, string> = {}): Mundo => {
   })
   on('prompt.submit', (_$, e) => ({ text: e.text, context: e.context }))
   on('classic.Notification', () => ({}))
+  on('classic.Stop', () => ({}))
 
   return mundo
 }
+
+const guardado = (mundo: Mundo): Record<string, unknown> => JSON.parse(mundo.archivos.get(`${REGISTRO}/local_aqui.json`) ?? '{}')
 
 test('register: a session writes its own record in the shared folder and reads it back every 3 s', async ($, on) => {
   const mundo = armar(on)
@@ -76,4 +79,15 @@ test('register: a process the canal launched to answer leaves no trace and reads
   expect(mundo.escritos).toEqual([])
   expect(mundo.listados).toEqual([])
   expect(mundo.llamadasApp).toEqual([])
+})
+
+test('register: a turn that ends with background work running writes it down, and the next prompt clears it', async ($, on) => {
+  const mundo = armar(on)
+
+  await $.prompt.submit(ENTRADA)
+  const tarea = { id: 't1', type: 'subagent', status: 'running', description: 'Re-revisar lote T1+T2' }
+  await $.classic.Stop({ stop_hook_active: false, background_tasks: [tarea] } as never)
+  expect(guardado(mundo).tareas).toEqual({ cuantas: 1, nombre: 'Re-revisar lote T1+T2' })
+  await $.prompt.submit(ENTRADA)
+  expect(guardado(mundo).tareas).toBeNull()
 })

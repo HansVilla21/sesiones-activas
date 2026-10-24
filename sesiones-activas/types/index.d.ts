@@ -14,7 +14,11 @@ export type SessionRecord = {
   activatedAt: number | null
   /** One line on what waits for you: the question asked, or the gist of the last answer. Absent in older files. */
   summary?: string | null
+  /** The background work the last turn left running: how many, and the name of the one when it is one. Absent in older files. */
+  tareas?: Tareas | null
 }
+
+export type Tareas = { cuantas: number; nombre: string | null }
 
 /** Marks other sessions leave: when a row was removed and when it was seen. */
 export type Marks = {
@@ -30,8 +34,10 @@ export type Row = {
   isAsking: boolean
   isSelf: boolean
   ago: string
-  /** Shown under the name in Te espera only; null elsewhere. */
+  /** Shown under the name: what waits for you in Te espera, the background work in Trabajando; null elsewhere. */
   summary: string | null
+  /** It answered you and still runs background work: drawn with a half dot. Absent counts as false. */
+  isBackground?: boolean
 }
 
 export type View = Record<Bucket, Row[]>

@@ -2,9 +2,10 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { CanalVista, Marks, Row, SessionRecord, View } from '../types'
 import { fijarAbierta, refrescarCanal } from './canal'
-import { ASKING_TOOLS, CANAL_LIMPIADO, EMPTY, EMPTY_CANAL, IDENTIFY_EVERY_MS, isStartupRace, LIVE_EVERY_MS, LIVE_LIMIT, LOG_LINES, PANE, READ_EVERY_MS, TITLE } from './config'
-import { appendLog, leaveMarks, leaveStamp, readEntries, readRecord, saveRecord } from './entries'
-import { actionForElement, actionGate, askingSummary, buildView, countRows, errorText, missingFromList, newlyWaiting, openCommand, parseSessionInfo, parseSessionList, recordFromApp, summaryOf, textOf, withAppInfo } from './model'
+import { ASKING_TOOLS, CANAL_LIMPIADO, EMPTY, EMPTY_CANAL, IDENTIFY_EVERY_MS, LIVE_EVERY_MS, LIVE_LIMIT, PANE, READ_EVERY_MS, TITLE } from './config'
+import { leaveMarks, leaveStamp, logFailure, readEntries, readRecord, saveRecord } from './entries'
+import { tareasDe } from './fondo'
+import { actionForElement, actionGate, askingSummary, buildView, countRows, missingFromList, newlyWaiting, openCommand, parseSessionInfo, parseSessionList, recordFromApp, summaryOf, textOf, withAppInfo } from './model'
 import type { Live, SessionInfo } from './model'
 import { bandTree, paneTree } from './ui'
 import type { Actions } from './ui'
@@ -32,14 +33,7 @@ const canalMemo = { texto: '', error: '' }
 // One action at a time: a click's focus already acted, so the press of a second click right after is skipped.
 const isFresh = actionGate()
 
-const logError = async ($: EngineInterface, where: string, error: unknown) => {
-  if (dir === null || isStartupRace(errorText(error))) return
-  try {
-    await appendLog(portOf($), dir, `${new Date(await $.clock.now()).toISOString()} ${where}: ${errorText(error)}`, LOG_LINES)
-  } catch {
-    // The log is best effort: a failure to write it must not stop the mod.
-  }
-}
+const logError = ($: EngineInterface, where: string, error: unknown) => logFailure(portOf($), dir, where, error)
 
 const askApp = async ($: EngineInterface, tool: string, args: Record<string, unknown>): Promise<string | null> => {
   const result = await $.mcp.call('ccd_session_mgmt', tool, args)
@@ -235,14 +229,21 @@ export const register: Register = on => {
   on('prompt.submit', async ($, e, next) => {
     if (e.isMeta !== true) {
       const now = await $.clock.now()
-      await saveSelf($, { activatedAt: now, phase: 'trabajando', phaseAt: now })
+      await saveSelf($, { activatedAt: now, phase: 'trabajando', phaseAt: now, tareas: null })
     }
 
     return next(e)
   })
 
   on('turn.start', async ($, e, next) => {
-    if (e.agentId === undefined) await setPhase($, 'trabajando')
+    if (e.agentId === undefined) await saveSelf($, { phase: 'trabajando', phaseAt: await $.clock.now(), summary: null, tareas: null })
+
+    return next(e)
+  })
+
+  // A turn that ends with background work running answered you but keeps working: the app wakes it when the work ends.
+  on('classic.Stop', async ($, e, next) => {
+    await saveSelf($, { tareas: tareasDe(e.background_tasks) })
 
     return next(e)
   })

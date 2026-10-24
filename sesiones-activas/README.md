@@ -11,6 +11,10 @@ necesitan de ti.
 - Dentro de "Te espera", lo que te pregunta algo (naranja) va antes de lo que solo terminó (azul).
 - Cada sesión en "Te espera" muestra una línea con lo que te espera: la pregunta que te hace, el permiso que pide o,
   si terminó, la pregunta con la que cierra su respuesta (o su primera frase).
+- **Tareas en segundo plano** (desde la 0.6.0): una sesión que ya te respondió pero sigue con tareas en segundo plano
+  (un agente, un comando o un workflow corriendo) queda en "Trabajando" con el punto a medias (◐) y la línea "Te
+  respondió · sigue con 1 tarea: <nombre>" (o "con N tareas"). Pasa a "Te espera", con su aviso, cuando las tareas
+  terminan y la sesión cierra su respuesta.
 - **Entre proyectos** (desde la 0.5.0): un bloque morado después de Quietas con las consultas que un proyecto le hizo a
   otro por el mod `canal-interno`. Ver abajo.
 
@@ -36,6 +40,9 @@ Las consultas no aparecen como sesiones: el proyecto que responde se abre sin ve
 - Una sesión entra a la lista cuando le escribes y sale cuando la quitas; si le vuelves a escribir, regresa.
 - Las archivadas y las que llevan más de 30 días sin movimiento salen solas.
 - Lo que te espera sobrevive a un reinicio; lo que estaba trabajando se da por cortado.
+- Las tareas en segundo plano salen de lo que la app le pasa al mod al final de cada respuesta (`background_tasks` del
+  evento `Stop`); las programadas para más tarde no cuentan. Si pasan 3 horas sin noticias (la app se cerró y las
+  tareas se cortaron, por ejemplo), la sesión se da por terminada y pasa a "Te espera".
 
 ## Cómo funciona
 

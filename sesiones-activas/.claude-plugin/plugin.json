@@ -1,6 +1,6 @@
 {
   "name": "sesiones-activas",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Junta en una franja y un panel las sesiones en las que estás trabajando, ordenadas por lo que necesitan de ti",
   "author": { "name": "Hans Villalobos" },
   "types": "./types/index.d.ts"

@@ -120,6 +120,27 @@ test('a waiting session shows its one-line summary under its name', async ($, on
   }
 })
 
+test('a session that answered and still runs background work has a half dot and its line in Trabajando', async ($, on) => {
+  const line = 'Te respondió · sigue con 1 tarea: Re-revisar lote T1+T2'
+  const only = (patch: Partial<Row>): View => ({ espera: [], trabajando: [row('local_f', patch)], quieta: [] })
+  on('ui.render', { component: 'Pane', requestId: 'fondo' }, ($, e) =>
+    paneTree($.ui.resolve(e), only({ isBackground: true, summary: line }), noop, e.surface),
+  )
+  on('ui.render', { component: 'Pane', requestId: 'activa' }, ($, e) => paneTree($.ui.resolve(e), only({}), noop, e.surface))
+
+  for (const surface of SURFACES) {
+    const ui = await $.ui.mount({ plugin: PLUGIN, surface, component: 'Pane', requestId: 'fondo', props: PANE_PROPS })
+    expect(await ui.find({ type: 'Text', text: /^◐$/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /^●$/ })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /^Te respondió · sigue con 1 tarea: Re-revisar lote T1\+T2$/ })).toBeDefined()
+    await ui.unmount()
+    const plain = await $.ui.mount({ plugin: PLUGIN, surface, component: 'Pane', requestId: 'activa', props: PANE_PROPS })
+    expect(await plain.find({ type: 'Text', text: /^●$/ })).toBeDefined()
+    expect(await plain.find({ type: 'Text', text: /^◐$/ })).toBeUndefined()
+    await plain.unmount()
+  }
+})
+
 test('in a narrow column the name is cut to fit and the time and remove mark never shrink', async ($, on) => {
   const narrow = { title: 'Sesiones activas', isFocused: false, bodyColumns: 30, placement: 'dock', scroll: {} } as never
   const long: View = { espera: [row('local_n', { title: 'Mod - Sesiones activas y trabajando en el diseño' })], trabajando: [], quieta: [] }

@@ -20,7 +20,9 @@ todo y ábrela otra vez: el mod se carga al arrancar.
   - **Te espera:** las sesiones que terminaron o te preguntan algo. Las que te preguntan algo (punto naranja) van
     antes que las que solo terminaron (punto azul), y cada una dice en una línea qué te espera: la pregunta, el
     permiso que pide o cómo cerró su respuesta.
-  - **Trabajando:** las que están respondiendo ahora.
+  - **Trabajando:** las que están respondiendo ahora. Una que ya te respondió pero sigue con tareas en segundo plano
+    (un agente, un comando o un workflow corriendo) también va aquí, con el punto a medias (◐) y la línea "Te
+    respondió · sigue con 1 tarea: …". Pasa a "Te espera" cuando esas tareas terminan.
   - **Quietas:** las que no necesitan nada. **Limpiar** las saca a todas.
 - Las sesiones van en tarjetas por su grupo del sidebar. La tarjeta de la sesión en la que estás tiene el borde azul
   y la pastilla "estás aquí".
@@ -49,10 +51,11 @@ permisos.
 1. **Git.** Corre `git --version`. En Mac, si no está, el sistema ofrece instalar las herramientas de línea de
    comandos: pídele a la persona que acepte y espera a que termine.
 2. **El comando de Claude Code.** Corre `command -v claude`.
-   - Si no aparece, usa la copia que trae la app de escritorio. En Mac suele estar en
-     `~/Library/Application Support/Claude/claude-code/<versión>/<carpeta>/claude` y en Windows en
-     `%APPDATA%\Claude\claude-code\<versión>\<carpeta>\claude.exe`. Si hay varias versiones, usa la más alta, con la
-     ruta completa entre comillas en los pasos que siguen.
+   - Si no aparece, usa la copia que trae la app de escritorio: un archivo `claude` (en Windows, `claude.exe`) dentro de
+     una carpeta `claude-code/<versión>/<carpeta>/` de los datos de la app. En Mac búscala en
+     `~/Library/Application Support/Claude/`; en Windows ha estado en `%APPDATA%\Claude\` y en
+     `%LOCALAPPDATA%\Claude-Data\<carpeta>\`. Si hay varias versiones, usa la más alta, con la ruta completa entre
+     comillas en los pasos que siguen.
    - Si tampoco la encuentras, salta a [Instalar con clics](#instalar-con-clics).
 3. **Agregar este repositorio e instalar el mod:**
 
@@ -98,7 +101,7 @@ Reinicia la app. La carpeta `~/.claude/sesiones-activas/` queda; se puede borrar
 
 ## Probado en
 
-- Windows 10, app de escritorio de Claude Code 2.1.304: funciona y es la que Hans usa a diario.
+- Windows 10, app de escritorio de Claude Code 2.1.308: funciona y es la que Hans usa a diario.
 - Mac: el código tiene su camino para Mac (para abrir una sesión usa el comando `open`), pero todavía no se ha
   probado ahí. Si algo falla, lo primero que hay que mandarle a Hans es el contenido de `_errores.log`.
 
