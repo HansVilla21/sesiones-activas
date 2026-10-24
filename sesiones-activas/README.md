@@ -41,7 +41,8 @@ Las consultas no aparecen como sesiones: el proyecto que responde se abre sin ve
 - Las archivadas y las que llevan más de 30 días sin movimiento salen solas.
 - Lo que te espera sobrevive a un reinicio; lo que estaba trabajando se da por cortado.
 - Las tareas en segundo plano salen de lo que la app le pasa al mod al final de cada respuesta (`background_tasks` del
-  evento `Stop`); las programadas para más tarde no cuentan. Si pasan 3 horas sin noticias (la app se cerró y las
+  evento `Stop`); las programadas para más tarde no cuentan, y tampoco la vigilancia de una página publicada (la app
+  la deja escuchando comentarios por días: tipo `artifact-auto-react`, "live updates for artifact …"). Si pasan 3 horas sin noticias (la app se cerró y las
   tareas se cortaron, por ejemplo), la sesión se da por terminada y pasa a "Te espera".
 
 ## Cómo funciona

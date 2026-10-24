@@ -6,12 +6,21 @@ export const FONDO_MAX_MS = 3 * 3_600_000
 
 const NAME_ROOM = 90
 
-/** What `classic.Stop` says of the background work a turn leaves running: how many, and the one's name when it is one. */
-export const tareasDe = (tasks: ReadonlyArray<{ description?: string }> | undefined): Tareas | null => {
-  if (tasks === undefined || tasks.length === 0) return null
-  const name = tasks.length === 1 ? (tasks[0]?.description ?? '').replace(/\s+/g, ' ').trim().slice(0, NAME_ROOM) : ''
+type BackgroundTask = { type?: string; description?: string }
 
-  return { cuantas: tasks.length, nombre: name.length > 0 ? name : null }
+// A session that published a page keeps watching it for comments and new versions, for days, re-armed at every start.
+// The app lists that watch with the background tasks, but it is no work. Seen in a real transcript as type
+// `artifact-auto-react`, described "live updates for artifact <url> (re-armed on session start)".
+const isPageWatch = (task: BackgroundTask): boolean =>
+  /artifact/i.test(task.type ?? '') || /^live updates for artifact\b/i.test((task.description ?? '').trim())
+
+/** What `classic.Stop` says of the background work a turn leaves running: how many, and the one's name when it is one. */
+export const tareasDe = (tasks: readonly BackgroundTask[] | undefined): Tareas | null => {
+  const work = (tasks ?? []).filter(task => !isPageWatch(task))
+  if (work.length === 0) return null
+  const name = work.length === 1 ? (work[0]?.description ?? '').replace(/\s+/g, ' ').trim().slice(0, NAME_ROOM) : ''
+
+  return { cuantas: work.length, nombre: name.length > 0 ? name : null }
 }
 
 /** It answered you, or got an answer to its question, and still runs background work: it is working, not waiting. */

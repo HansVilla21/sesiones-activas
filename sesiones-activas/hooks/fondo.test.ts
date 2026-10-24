@@ -33,6 +33,22 @@ test('a turn that ends with background work running counts it, and names it when
   expect(tareasDe(undefined)).toBeNull()
 })
 
+test('watching a published page for comments is no work: only the real tasks count', () => {
+  // As a session that published a page days before sends it: a watch the app re-arms at every start.
+  const vigilancia = {
+    id: 'w1',
+    type: 'artifact-auto-react',
+    status: 'running',
+    description: 'live updates for artifact https://claude.ai/artifact/PaginaDeEjemplo123 (re-armed on session start)',
+  }
+  const revisor = { id: 't1', type: 'subagent', status: 'running', description: 'Re-revisar lote T1+T2' }
+
+  expect(tareasDe([vigilancia])).toBeNull()
+  expect(tareasDe([{ ...vigilancia, type: 'monitor' }])).toBeNull()
+  expect(tareasDe([{ ...vigilancia, description: 'Página' }])).toBeNull()
+  expect(tareasDe([vigilancia, revisor])).toEqual(UNA)
+})
+
 test('a session that answered and still runs background work is working, with a half dot and a line saying so', () => {
   const view = buildView([record({ tareas: UNA })], noMarks, live, null, NOW)
 
