@@ -14,11 +14,22 @@ export type SessionRecord = {
   activatedAt: number | null
   /** One line on what waits for you: the question asked, or the gist of the last answer. Absent in older files. */
   summary?: string | null
-  /** The background work the last turn left running: how many, and the name of the one when it is one. Absent in older files. */
-  tareas?: Tareas | null
+  /** The background work the last turn left running, cleared when a turn starts. Absent in older files; 0.6.0 and
+   *  0.6.1 wrote `{ cuantas, nombre }` here, read as no work. */
+  tareas?: TareaDeFondo[] | null
+  /** When each task of the last turn end was first seen, by its id: kept across turns, so a task's age survives them. */
+  vistas?: Record<string, number>
 }
 
-export type Tareas = { cuantas: number; nombre: string | null }
+/** One task the last turn left running in the background, as the view weighs it. */
+export type TareaDeFondo = {
+  id: string
+  /** The app's label: `subagent`, `workflow`, `shell`, `monitor`... */
+  tipo: string
+  nombre: string | null
+  /** When a turn's end first listed it. */
+  desde: number
+}
 
 /** Marks other sessions leave: when a row was removed and when it was seen. */
 export type Marks = {

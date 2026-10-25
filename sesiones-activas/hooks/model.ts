@@ -1,7 +1,7 @@
 import type { McpToolResult } from 'claude-code'
 
 import type { Actions, Bucket, Marks, Phase, Row, SessionRecord, View } from '../types'
-import { enFondo, lineaDeFondo } from './fondo'
+import { enFondo, lineaDeFondo, tareasVivas } from './fondo'
 
 export const textOf = (result: McpToolResult): string => {
   const block = result.content.find(one => one.type === 'text') as { text?: string } | undefined
@@ -108,7 +108,7 @@ export const buildView = (
 
     const isRunning = isSelf || live === null || live.running.has(record.id)
     const bucket = bucketOf(record, marks, isRunning, now)
-    const fondo = enFondo(record, now) ? (record.tareas ?? null) : null
+    const fondo = enFondo(record, now) ? tareasVivas(record, now) : null
     const row: Row = {
       id: record.id,
       title: displayTitle(record.title, record.cwd),

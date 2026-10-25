@@ -4,7 +4,7 @@ import type { CanalVista, Marks, Row, SessionRecord, View } from '../types'
 import { fijarAbierta, refrescarCanal } from './canal'
 import { ASKING_TOOLS, CANAL_LIMPIADO, EMPTY, EMPTY_CANAL, IDENTIFY_EVERY_MS, LIVE_EVERY_MS, LIVE_LIMIT, PANE, READ_EVERY_MS, TITLE } from './config'
 import { leaveMarks, leaveStamp, logFailure, readEntries, readRecord, saveRecord } from './entries'
-import { tareasDe } from './fondo'
+import { fondoDe } from './fondo'
 import { actionForElement, actionGate, askingSummary, buildView, countRows, missingFromList, newlyWaiting, openCommand, parseSessionInfo, parseSessionList, recordFromApp, summaryOf, textOf, withAppInfo } from './model'
 import type { Live, SessionInfo } from './model'
 import { bandTree, paneTree } from './ui'
@@ -243,7 +243,7 @@ export const register: Register = on => {
 
   // A turn that ends with background work running answered you but keeps working: the app wakes it when the work ends.
   on('classic.Stop', async ($, e, next) => {
-    await saveSelf($, { tareas: tareasDe(e.background_tasks) })
+    await saveSelf($, fondoDe(e.background_tasks, self?.vistas ?? {}, await $.clock.now()))
 
     return next(e)
   })

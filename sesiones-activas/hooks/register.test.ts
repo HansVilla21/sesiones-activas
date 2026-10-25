@@ -87,7 +87,11 @@ test('register: a turn that ends with background work running writes it down, an
   await $.prompt.submit(ENTRADA)
   const tarea = { id: 't1', type: 'subagent', status: 'running', description: 'Re-revisar lote T1+T2' }
   await $.classic.Stop({ stop_hook_active: false, background_tasks: [tarea] } as never)
-  expect(guardado(mundo).tareas).toEqual({ cuantas: 1, nombre: 'Re-revisar lote T1+T2' })
+  expect(guardado(mundo).tareas).toEqual([{ id: 't1', tipo: 'subagent', nombre: 'Re-revisar lote T1+T2', desde: AHORA }])
+  await mundo.reloj.advance(60_000)
   await $.prompt.submit(ENTRADA)
   expect(guardado(mundo).tareas).toBeNull()
+  // When each task was first seen outlives the turn: the next turn's end does not start its clock over.
+  await $.classic.Stop({ stop_hook_active: false, background_tasks: [tarea] } as never)
+  expect(guardado(mundo).tareas).toEqual([{ id: 't1', tipo: 'subagent', nombre: 'Re-revisar lote T1+T2', desde: AHORA }])
 })

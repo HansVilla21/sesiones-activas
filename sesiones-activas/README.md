@@ -42,8 +42,11 @@ Las consultas no aparecen como sesiones: el proyecto que responde se abre sin ve
 - Lo que te espera sobrevive a un reinicio; lo que estaba trabajando se da por cortado.
 - Las tareas en segundo plano salen de lo que la app le pasa al mod al final de cada respuesta (`background_tasks` del
   evento `Stop`); las programadas para más tarde no cuentan, y tampoco la vigilancia de una página publicada (la app
-  la deja escuchando comentarios por días: tipo `artifact-auto-react`, "live updates for artifact …"). Si pasan 3 horas sin noticias (la app se cerró y las
-  tareas se cortaron, por ejemplo), la sesión se da por terminada y pasa a "Te espera".
+  la deja escuchando comentarios por días: tipo `artifact-auto-react`, "live updates for artifact …") ni un servidor
+  de desarrollo (`npm run dev`, `next dev`, `vite`...).
+- Cada tarea cuenta desde que el mod la vio por primera vez al final de una respuesta: un agente o un workflow, hasta
+  3 horas; un comando, solo sus primeros 15 minutos, porque uno que sigue corriendo después suele ser un servidor que
+  quedó prendido o algo trabado (se vio un comando de un ayudante colgado por horas en un `cat`).
 
 ## Cómo funciona
 
